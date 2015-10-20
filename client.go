@@ -5,7 +5,6 @@ import (
 	"log"
 	"math/rand"
 	"net/url"
-	"strconv"
 )
 
 type client struct {
@@ -39,7 +38,7 @@ func (c *client) Pub(topic, message string) {
 }
 
 func (c *client) Sub(topic string) {
-	sendMsg := SUB_PREFIX + strconv.Itoa(int(c.id)) + SPLIT_LINE + topic
+	sendMsg := SUB_PREFIX + topic
 	err := c.conn.WriteMessage(websocket.TextMessage, []byte(sendMsg))
 	if err != nil {
 		log.Println("write:", err)

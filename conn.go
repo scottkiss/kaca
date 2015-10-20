@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -82,7 +83,7 @@ func (c *connection) dispatch() {
 		msg := string(message)
 		if strings.Contains(msg, SUB_PREFIX) {
 			topic := strings.Split(msg, SUB_PREFIX)[1]
-			disp.sub <- topic
+			disp.sub <- strconv.Itoa(int(c.cid)) + SPLIT_LINE + topic
 		} else if strings.Contains(msg, PUB_PREFIX) {
 			topic_msg := strings.Split(msg, PUB_PREFIX)[1]
 			disp.pub <- topic_msg
