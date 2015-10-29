@@ -103,6 +103,26 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", 405)
 		return
 	}
+
+	upgrader.CheckOrigin = func(r *http.Request) bool {
+		return true
+	}
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	c := &connection{cid: uint64(rand.Int63()), send: make(chan []byte, 256), ws: ws, topics: make([]string, maxTopics)}
+	disp.register <- c
+	go c.dispatch()
+	c.deliver()
+}
+
+func serveWsCheckOrigin(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "GET" {
+		http.Error(w, "Method not allowed", 405)
+		return
+	}
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)

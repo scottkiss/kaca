@@ -5,9 +5,13 @@ import (
 	"net/http"
 )
 
-func ServeWs(addr string) {
+func ServeWs(addr string, checkOrigin bool) {
 	go disp.run()
-	http.HandleFunc("/ws", serveWs)
+	if checkOrigin {
+		http.HandleFunc("/ws", serveWsCheckOrigin)
+	} else {
+		http.HandleFunc("/ws", serveWs)
+	}
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatal("ListenAndServe: ", err)
