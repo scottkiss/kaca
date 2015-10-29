@@ -29,6 +29,13 @@ func NewClient(addr, path string) *client {
 	}
 }
 
+func (c *client) Broadcast(message string) {
+	err := c.conn.WriteMessage(websocket.TextMessage, []byte(message))
+	if err != nil {
+		log.Println("write:", err)
+	}
+}
+
 func (c *client) Pub(topic, message string) {
 	sendMsg := PUB_PREFIX + topic + SPLIT_LINE + message
 	err := c.conn.WriteMessage(websocket.TextMessage, []byte(sendMsg))
