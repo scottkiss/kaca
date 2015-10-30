@@ -16,7 +16,7 @@ import (
        )
 
 func main() {
-    go kaca.ServeWs(":8080")
+    kaca.ServeWs(":8080",true)
 }
 ```
 
