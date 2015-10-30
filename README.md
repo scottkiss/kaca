@@ -1,5 +1,5 @@
 # about kaca 
-a pub/sub messaging lib based on websocket  
+a pub/sub messaging system based on websocket  
 
 ## Getting started
 ```bash
@@ -8,7 +8,7 @@ go get github.com/scottkiss/kaca
 
 ## server
 
-```golang
+```go
 package main
 
 import (
@@ -16,13 +16,14 @@ import (
        )
 
 func main() {
+    //use true to set check origin
     kaca.ServeWs(":8080",true)
 }
 ```
 
-## client
+## pub/sub client
 
-```golang
+```go
 package main
 
 import (
@@ -32,20 +33,49 @@ import (
        )
 
 func main() {
-    producer := kaca.NewClient(":8080", "ws")
-    consumer := kaca.NewClient(":8080", "ws")
-    consumer.Sub("say")
-    consumer.Sub("you")
-    consumer.ConsumeMessage(func(message string) {
+              producer := kaca.NewClient(":8080", "ws")
+              consumer := kaca.NewClient(":8080", "ws")
+              consumer.Sub("say")
+              consumer.Sub("you")
+              consumer.ConsumeMessage(func(message string) {
                       fmt.Println("consume =>" + message)
-    })
-    time.Sleep(time.Second * time.Duration(2))
-    producer.Pub("you", "world")
-    producer.Pub("say", "hello")
-    time.Sleep(time.Second * time.Duration(2))
+                      })
+          time.Sleep(time.Second * time.Duration(2))
+              producer.Pub("you", "world")
+              producer.Pub("say", "hello")
+              time.Sleep(time.Second * time.Duration(2))
 }
-
 
 ```
 
+## broadcast client
+```go
+
+}ckage main
+
+import (
+        "fmt"
+        "github.com/scottkiss/kaca"
+        "time"
+       )
+
+func main() {
+              producer := kaca.NewClient(":8080", "ws")
+              consumer := kaca.NewClient(":8080", "ws")
+              c2 := kaca.NewClient(":8080", "ws")
+              c2.ConsumeMessage(func(message string) {
+                      fmt.Println("c2 consume =>" + message)
+                      })
+              consumer.Sub("say")
+              consumer.Sub("you")
+              consumer.ConsumeMessage(func(message string) {
+                      fmt.Println("consume =>" + message)
+                      })
+              time.Sleep(time.Second * time.Duration(2))
+              producer.Broadcast("broadcast...")
+              time.Sleep(time.Second * time.Duration(2))
+})
+}
+
+```
 
