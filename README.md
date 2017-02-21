@@ -51,7 +51,7 @@ func main() {
 ## broadcast client
 ```go
 
-}ckage main
+package main
 
 import (
         "fmt"
