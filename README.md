@@ -74,7 +74,6 @@ func main() {
               time.Sleep(time.Second * time.Duration(2))
               producer.Broadcast("broadcast...")
               time.Sleep(time.Second * time.Duration(2))
-})
 }
 
 ```
