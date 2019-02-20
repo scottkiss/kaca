@@ -37,6 +37,9 @@ func (d *dispatcher) run() {
 			if _, ok := d.connections[c]; ok {
 				delete(d.connections, c)
 				close(c.send)
+				if err := c.ws.Close(); err != nil {
+					fmt.Println(err)
+				}
 			}
 		case m := <-d.broadcast:
 			for c := range d.connections {
@@ -45,7 +48,9 @@ func (d *dispatcher) run() {
 				default:
 					close(c.send)
 					delete(d.connections, c)
-					c.ws.Close()
+					if err := c.ws.Close(); err != nil {
+						fmt.Println(err)
+					}
 				}
 			}
 		case m := <-d.sub:
