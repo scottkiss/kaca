@@ -1,6 +1,7 @@
 package kaca
 
 import (
+	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"math/rand"
@@ -68,5 +69,7 @@ func (c *client) ConsumeMessage(f func(m string)) {
 }
 
 func (c *client) Shutdown() {
-	c.conn.Close()
+	if err := c.conn.Close(); err != nil {
+		fmt.Println(err)
+	}
 }

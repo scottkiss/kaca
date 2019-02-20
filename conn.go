@@ -1,6 +1,7 @@
 package kaca
 
 import (
+	"fmt"
 	"github.com/gorilla/websocket"
 	"log"
 	"math/rand"
@@ -47,20 +48,26 @@ func (c *connection) deliver() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
-		c.ws.Close()
+		if err := c.ws.Close(); err != nil {
+			fmt.Println(err)
+		}
 	}()
 	for {
 		select {
 		case message, ok := <-c.send:
 			if !ok {
-				c.sendMsg(websocket.CloseMessage, []byte{})
+				if err := c.sendMsg(websocket.CloseMessage, []byte{}); err != nil {
+					fmt.Println(err)
+				}
 				return
 			}
 			if err := c.sendMsg(websocket.TextMessage, message); err != nil {
+				fmt.Println(err)
 				return
 			}
 		case <-ticker.C:
 			if err := c.sendMsg(websocket.PingMessage, []byte{}); err != nil {
+				fmt.Println(err)
 				return
 			}
 		}
@@ -70,11 +77,21 @@ func (c *connection) deliver() {
 func (c *connection) dispatch() {
 	defer func() {
 		disp.unregister <- c
-		c.ws.Close()
+		if err := c.ws.Close(); err != nil {
+			fmt.Println(err)
+		}
 	}()
-	c.ws.SetReadDeadline(time.Now().Add(pongWait))
+	if err := c.ws.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
+		fmt.Println(err)
+	}
 	c.ws.SetReadLimit(maxMessageSize)
-	c.ws.SetPongHandler(func(string) error { c.ws.SetReadDeadline(time.Now().Add(pongWait)); return nil })
+	c.ws.SetPongHandler(func(string) error {
+		if err := c.ws.SetReadDeadline(time.Now().Add(pongWait)); err != nil {
+			fmt.Println(err)
+			return err
+		}
+		return nil
+	})
 	for {
 		_, message, err := c.ws.ReadMessage()
 		if err != nil {
@@ -94,7 +111,10 @@ func (c *connection) dispatch() {
 }
 
 func (c *connection) sendMsg(mt int, payload []byte) error {
-	c.ws.SetWriteDeadline(time.Now().Add(writeWait))
+	if err := c.ws.SetWriteDeadline(time.Now().Add(writeWait)); err != nil {
+		fmt.Println(err)
+		return err
+	}
 	return c.ws.WriteMessage(mt, payload)
 }
 

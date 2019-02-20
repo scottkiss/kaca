@@ -1,6 +1,7 @@
 package kaca
 
 import (
+	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -44,6 +45,7 @@ func (d *dispatcher) run() {
 				default:
 					close(c.send)
 					delete(d.connections, c)
+					c.ws.Close()
 				}
 			}
 		case m := <-d.sub:
@@ -68,6 +70,10 @@ func (d *dispatcher) run() {
 						default:
 							close(c.send)
 							delete(d.connections, c)
+							if err := c.ws.Close(); err != nil {
+								fmt.Println(err)
+							}
+
 						}
 						break
 					}
