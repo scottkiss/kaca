@@ -123,10 +123,6 @@ func serveWs(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", 405)
 		return
 	}
-
-	upgrader.CheckOrigin = func(r *http.Request) bool {
-		return true
-	}
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
@@ -143,6 +139,11 @@ func serveWsCheckOrigin(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Method not allowed", 405)
 		return
 	}
+
+	upgrader.CheckOrigin = func(r *http.Request) bool {
+		return true
+	}
+
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Println(err)
